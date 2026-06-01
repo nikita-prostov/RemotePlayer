@@ -11,6 +11,9 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    @GET("ping")
+    suspend fun ping(): Response<ResponseBody>
+
     @POST("switch")
     suspend fun switch(@Query("to") direction: String): TrackInfo
 

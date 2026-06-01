@@ -5,12 +5,15 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,16 +36,16 @@ import com.nks.interactive.remoteplayer.controller.viewmodels.SettingsScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onClose: (() -> Unit)? = null) {
     val viewModel = koinViewModel<SettingsScreenVM>()
     var ipInput by remember { mutableStateOf(viewModel.ipAddress) }
     var frequencyInput by remember { mutableStateOf(viewModel.pollingFrequency.toString()) }
     var ipError by remember { mutableStateOf(false) }
     var successMessage by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text("Settings", style = MaterialTheme.typography.headlineSmall)
-        Spacer(Modifier.height(16.dp))
+    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+        Text("Settings", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground)
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
             value = ipInput,
@@ -56,7 +59,7 @@ fun SettingsScreen() {
         Text("Пример: 192.168.1.100", style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.outline)
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
             value = frequencyInput,
@@ -85,25 +88,7 @@ fun SettingsScreen() {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        OutlinedButton(
-            onClick = {
-                if (ipInput.matches(Regex("^(\\d{1,3}\\.){3}\\d{1,3}$"))) {
-                    viewModel.ipAddress = ipInput
-                    val freq = frequencyInput.toIntOrNull() ?: 3
-                    viewModel.pollingFrequency = freq
-                    frequencyInput = viewModel.pollingFrequency.toString()
-                    ipError = false
-                    successMessage = "Настройки сохранены"
-                } else {
-                    ipError = true
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Сохранить")
-        }
+        Spacer(Modifier.height(8.dp))
 
         if (successMessage.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
@@ -111,7 +96,36 @@ fun SettingsScreen() {
                 Text(successMessage, modifier = Modifier.padding(8.dp))
             }
         }
+        Spacer(Modifier.height(16.dp))
+        Row{
+            if(onClose != null){
+                OutlinedButton(onClick = {
+                    onClose.invoke()
+                }, colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Закрыть")
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            OutlinedButton(
+                onClick = {
+                    if (ipInput.matches(Regex("^(\\d{1,3}\\.){3}\\d{1,3}$"))) {
+                        viewModel.ipAddress = ipInput
+                        val freq = frequencyInput.toIntOrNull() ?: 3
+                        viewModel.pollingFrequency = freq
+                        frequencyInput = viewModel.pollingFrequency.toString()
+                        ipError = false
+                        successMessage = "Настройки сохранены"
+                    } else {
+                        ipError = true
+                    }
+                }
+            ) {
+                Text("Сохранить")
+            }
 
-        Spacer(Modifier.weight(1f))
+        }
     }
 }

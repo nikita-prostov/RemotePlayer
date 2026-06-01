@@ -17,7 +17,7 @@ class App: Application() {
         settings = AppSettingsStorage(this)
 
         if (settings.ipAddress.isNotEmpty()) {
-            ApiClient.init("http://${settings.ipAddress}:5000/")
+            ApiClient.init(settings.ipAddress)
         }
 
         startKoin {

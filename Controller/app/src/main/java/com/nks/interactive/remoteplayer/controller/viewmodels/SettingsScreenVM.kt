@@ -6,8 +6,8 @@ import com.nks.interactive.remoteplayer.controller.localStorage.AppSettingsStora
 import org.koin.java.KoinJavaComponent.inject
 
 class SettingsScreenVM(
-    private val settingsStorage: AppSettingsStorage,
-    private val apiClient: ApiClient
+    private val apiClient: ApiClient,
+    private val settingsStorage: AppSettingsStorage
 ) : ViewModel() {
 
     var ipAddress: String

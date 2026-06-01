@@ -8,6 +8,8 @@ namespace NKS.Interactive.RemotePlayer.Server.Controllers
     [Route("/")]
     public class ComandController(AudioService audioService) : ControllerBase
     {
+        [HttpGet("ping")]
+        public IActionResult Ping() => Ok();
 
         [HttpPost("switch")]
         public async Task<IActionResult> Switch([FromQuery] string to)

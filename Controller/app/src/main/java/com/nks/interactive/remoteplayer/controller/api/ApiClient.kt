@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     private var baseUrl: String = ""
     private var retrofit: Retrofit? = null
-
     private val logger = HttpRequestLogger()
     private val loggingInterceptor = HttpLoggingInterceptor(logger)
     private val okHttpClient = OkHttpClient.Builder()
@@ -20,6 +19,8 @@ object ApiClient {
         .writeTimeout(10, TimeUnit.SECONDS)
         .build()
 
+    val isInitialized: Boolean
+        get() = retrofit != null
 
     val api: ApiService
         get() {
@@ -30,16 +31,26 @@ object ApiClient {
             throw IllegalStateException("ApiClient не инициализирован. Вызовите ApiClient.init(url)")
         }
 
-    fun init(url: String) {
-        val newUrl = if (url.endsWith("/")) url else "$url/"
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        if (newUrl != baseUrl) {
-            baseUrl = newUrl
-            retrofit = Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
+    fun init(ipAddress: String): Result<Unit> {
+        return try {
+            if (!ipAddress.matches(Regex("^(\\d{1,3}\\.){3}\\d{1,3}$"))) {
+                return Result.failure(IllegalArgumentException("Invalid IP: $ipAddress"))
+            }
+
+            val url = "http://$ipAddress:5000/"
+            val newUrl = if (url.endsWith("/")) url else "$url/"
+
+            if (newUrl != baseUrl) {
+                baseUrl = newUrl
+                retrofit = Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .client(okHttpClient)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 }
