@@ -9,6 +9,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
         private Mp3FileReader? _audioReader;
         private AudioConverter converter = new AudioConverter(savePath);
         private float _volume = 1f;
+        private bool _isLocked = false;
 
         public Audio? CurrentTrack { get; set; }
         public bool IsPlaying { get; set; }
@@ -19,7 +20,8 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
             set
             {
                 _volume = Math.Clamp(value, 0f, 1f);
-                _outputDevice.Volume = _volume;
+                if(_outputDevice != null) 
+                    _outputDevice.Volume = _volume;
             }
         }
 
@@ -28,10 +30,13 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
 
         public async Task PlayAsync(string url, Audio track)
         {
+            if(_isLocked) return;
+
             Stop();
             try
             {
                 CurrentTrack = track;
+                _isLocked = true;
                 string filePath = await converter.ConvertAsync(url, track);
                 Console.WriteLine($"Playing: {track.Title} - {track.Artist}");
 
@@ -47,6 +52,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
                 IsPlaying = true;
 
                 TrackStarted?.Invoke(track);
+                _isLocked = false;
             }
             catch (Exception ex)
             {
