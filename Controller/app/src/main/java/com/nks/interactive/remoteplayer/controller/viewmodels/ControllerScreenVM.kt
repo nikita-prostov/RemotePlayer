@@ -1,5 +1,6 @@
 package com.nks.interactive.remoteplayer.controller.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +12,7 @@ import com.nks.interactive.remoteplayer.controller.models.TrackInfo
 import com.nks.interactive.remoteplayer.controller.models.ServerState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.inc
 
@@ -27,6 +29,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     private var lastPage = 1
 
     private var volumeJob: Job? = null
+    private var _pollingJob: Job? = null
 
     val currentTrack: TrackInfo?
         get() = _currentTrack
@@ -54,6 +57,42 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
         get() = _isLoading.value
     val tracks:List<TrackInfo>
         get() = _trackList.value
+
+    fun startPolling() {
+        _pollingJob?.cancel()
+        _pollingJob = viewModelScope.launch {
+            while (isActive) {
+                refreshState()
+                delay(10_000) // 10 секунд
+            }
+        }
+    }
+
+    fun stopPolling(){
+        _pollingJob?.cancel()
+    }
+
+    private suspend fun refreshState() {
+        try {
+            val currentResponse = apiService.getCurrent()
+            if (currentResponse.isSuccessful) {
+                _currentTrack = currentResponse.body()
+            }
+
+            val nextResponse = apiService.getNext()
+            if (nextResponse.isSuccessful) {
+                _nextTrack = nextResponse.body()
+            }
+        } catch (e: Exception) {
+            Log.e("ControllerVM", "Polling failed: ${e.message}")
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _pollingJob?.cancel()
+    }
+
     fun getCurrentState(){
         if(!_isInitialized){
             viewModelScope.launch {
