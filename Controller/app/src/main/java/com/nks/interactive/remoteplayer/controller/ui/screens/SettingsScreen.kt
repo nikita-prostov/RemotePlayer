@@ -22,6 +22,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,47 +33,85 @@ import com.nks.interactive.remoteplayer.controller.viewmodels.SettingsScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SettingsScreen(){
+fun SettingsScreen() {
     val viewModel = koinViewModel<SettingsScreenVM>()
-    var input by remember { mutableStateOf(viewModel.apiUrl) }
-    var errorMessage by remember { mutableStateOf("") }
+    var ipInput by remember { mutableStateOf(viewModel.ipAddress) }
+    var frequencyInput by remember { mutableStateOf(viewModel.pollingFrequency.toString()) }
+    var ipError by remember { mutableStateOf(false) }
     var successMessage by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("Settings", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("Settings", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(16.dp))
-        OutlinedTextField(input,  {input = it; errorMessage = ""}, Modifier
-            .fillMaxWidth()
-            .padding(8.dp), isError = errorMessage.isNotEmpty(), label = {Text("Enter api url:")})
-        if(errorMessage.isNotEmpty()) {
-            OutlinedCard(Modifier.fillMaxWidth(), colors = CardDefaults.outlinedCardColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer
-            )) {
-                Box(Modifier.padding(8.dp)) {
-                    Text(errorMessage)
+
+        OutlinedTextField(
+            value = ipInput,
+            onValueChange = { ipInput = it; ipError = false },
+            label = { Text("IP-адрес сервера") },
+            placeholder = { Text("192.168.1.100") },
+            isError = ipError,
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1
+        )
+        Text("Пример: 192.168.1.100", style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline)
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = frequencyInput,
+            onValueChange = {
+                frequencyInput = it.filter { c -> c.isDigit() }
+            },
+            label = { Text("Частота опроса (раз в минуту)") },
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1
+        )
+        Text(
+            "Сейчас: ${viewModel.pollingIntervalDescription}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.outline
+        )
+
+        if (ipError) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedCard(
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            ) {
+                Text("Неверный IP-адрес", modifier = Modifier.padding(8.dp))
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = {
+                if (ipInput.matches(Regex("^(\\d{1,3}\\.){3}\\d{1,3}$"))) {
+                    viewModel.ipAddress = ipInput
+                    val freq = frequencyInput.toIntOrNull() ?: 3
+                    viewModel.pollingFrequency = freq
+                    frequencyInput = viewModel.pollingFrequency.toString()
+                    ipError = false
+                    successMessage = "Настройки сохранены"
+                } else {
+                    ipError = true
                 }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Сохранить")
+        }
+
+        if (successMessage.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedCard {
+                Text(successMessage, modifier = Modifier.padding(8.dp))
             }
         }
-        Spacer(Modifier.height(8.dp))
-        OutlinedButton({
-            if(input.startsWith("http://") || input.startsWith("https://")){
-                viewModel.apiUrl = input
-                errorMessage = ""
-                successMessage = "Api url success saved"
-            }
-            else
-                errorMessage = "Invalid api url"
-        }) {
-            Text("Save")
-        }
+
         Spacer(Modifier.weight(1f))
-        if(successMessage.isNotEmpty())
-            OutlinedCard(Modifier.fillMaxWidth()) {
-                Box(Modifier.padding(8.dp)) {
-                    Text(successMessage)
-                }
-            }
     }
 }

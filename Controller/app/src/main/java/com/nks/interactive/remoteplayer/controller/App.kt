@@ -16,9 +16,8 @@ class App: Application() {
         super.onCreate()
         settings = AppSettingsStorage(this)
 
-        val savedUrl = settings.apiUrl
-        if (savedUrl.isNotEmpty()) {
-            ApiClient.init(savedUrl)
+        if (settings.ipAddress.isNotEmpty()) {
+            ApiClient.init("http://${settings.ipAddress}:5000/")
         }
 
         startKoin {

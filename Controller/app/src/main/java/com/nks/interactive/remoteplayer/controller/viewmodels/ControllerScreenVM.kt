@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nks.interactive.remoteplayer.controller.api.ApiService
+import com.nks.interactive.remoteplayer.controller.localStorage.AppSettingsStorage
 import com.nks.interactive.remoteplayer.controller.models.TrackInfo
 import com.nks.interactive.remoteplayer.controller.models.ServerState
 import kotlinx.coroutines.Job
@@ -16,7 +17,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.inc
 
-class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
+class ControllerScreenVM(private val apiService: ApiService, private val settingsStorage: AppSettingsStorage) : ViewModel() {
 
     private var _isInitialized = false
     private var _currentTrack by mutableStateOf<TrackInfo?>(null)
@@ -60,10 +61,11 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
 
     fun startPolling() {
         _pollingJob?.cancel()
+        val interval = settingsStorage.pollingIntervalSeconds * 1000L
         _pollingJob = viewModelScope.launch {
             while (isActive) {
                 refreshState()
-                delay(10_000) // 10 секунд
+                delay(interval)
             }
         }
     }
