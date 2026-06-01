@@ -32,9 +32,6 @@ interface ApiService {
     @POST("pause")
     suspend fun pause(): ResponseBody
 
-    @POST("stop")
-    suspend fun stop(): ResponseBody
-
     @POST("load")
     suspend fun load(
         @Query("count") count: Int = 100,

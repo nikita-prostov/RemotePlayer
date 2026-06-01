@@ -61,13 +61,6 @@ namespace NKS.Interactive.RemotePlayer.Server.Controllers
             return Ok("ok");
         }
 
-        [HttpPost("stop")]
-        public IActionResult Stop()
-        {
-            audioService.Stop();
-            return Ok("ok");
-        }
-
         [HttpPost("load")]
         public async Task<IActionResult> Load([FromQuery] int count, [FromQuery] int page) => Ok(await audioService.Load(count, page));
         
