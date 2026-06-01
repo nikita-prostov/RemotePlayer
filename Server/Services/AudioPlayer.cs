@@ -3,12 +3,12 @@ using VkNet.Model;
 
 namespace NKS.Interactive.RemotePlayer.Server.Services
 {
-    public class AudioPlayer(string savePath)
+    public class AudioPlayer(string savePath, float volume)
     {
         private WaveOutEvent? _outputDevice;
         private Mp3FileReader? _audioReader;
         private AudioConverter converter = new AudioConverter(savePath);
-        private float _volume = 1f;
+        private float _volume = volume;
         private bool _isLocked = false;
 
         public Audio? CurrentTrack { get; set; }

@@ -5,7 +5,7 @@ using VkNet.Model;
 
 namespace NKS.Interactive.RemotePlayer.Server.Services
 {
-    public class AudioService(string savePath, string accessToken, long userId)
+    public class AudioService(string savePath, string accessToken, long userId, float volume)
     {
         private VkApi api = new VkApi();
         private List<Audio> audios = [];
@@ -13,7 +13,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
         private bool useShuffled = false;
         private int current = 0;
         private bool isStarted = false;
-        private AudioPlayer player = new AudioPlayer(savePath);
+        private AudioPlayer player = new AudioPlayer(savePath,volume);
 
         private readonly string accessToken = accessToken;
         private readonly long userId = userId;
@@ -81,7 +81,28 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
 
         public void Pause() => player.Pause();
 
-        public void SetVolume(float value) => player.Volume = value;
+        public void SetVolume(float value)
+        {
+            float tolerance = 0.1f;
+            float minValue = player.Volume - tolerance;
+            float maxValue = player.Volume + tolerance;
+            if (value > maxValue || value < minValue)
+            {
+                string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VkAudioPlayer", "data.txt");
+                List<string> content = File.ReadAllLines(path).ToList();
+                if (content.Count == 4)
+                {
+                    content[4] = value.ToString();
+                }
+                else
+                {
+                    content.Add(value.ToString());
+                }
+                player.Volume = value;
+                File.WriteAllLines(path, content);
+            }
+            
+        }
 
         public void Shuffle()
         {
