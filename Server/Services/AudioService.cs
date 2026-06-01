@@ -68,8 +68,6 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
 
         public void Pause() => player.Pause();
 
-        public void Stop() => player.Stop();
-
         public void SetVolume(float value) => player.Volume = value;
 
         public void Shuffle()
