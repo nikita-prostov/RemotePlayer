@@ -72,6 +72,9 @@ catch(Exception ex)
         await audioService.Load();
     }
 }
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.SetMinimumLevel(LogLevel.Warning);
 
 builder.Services.AddControllers();
 builder.Services.AddSingleton(audioService);
