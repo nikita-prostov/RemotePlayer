@@ -139,8 +139,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
                 list.Add(new TrackInfo
                 {
                     Artist = audio.Artist,
-                    Title = audio.Title,
-                    Durations = audio.Duration
+                    Title = audio.Title
                 });
             }
             return list;
@@ -173,8 +172,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
                 list.Add(new TrackInfo
                 {
                     Artist = track.Artist,
-                    Title = track.Title,
-                    Durations = track.Duration
+                    Title = track.Title
                 });
             }
             return list;
