@@ -19,9 +19,6 @@ object ApiClient {
         .writeTimeout(10, TimeUnit.SECONDS)
         .build()
 
-    val isInitialized: Boolean
-        get() = retrofit != null
-
     val api: ApiService
         get() {
             val currentRetrofit = retrofit

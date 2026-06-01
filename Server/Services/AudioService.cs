@@ -29,7 +29,8 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
         {
             CurrentTrack = CurrentTrack,
             Volume = player.Volume,
-            IsPlaying = player.IsPlaying
+            IsPlaying = player.IsPlaying,
+            IsShuffled = useShuffled
         };
 
         public async Task Start()

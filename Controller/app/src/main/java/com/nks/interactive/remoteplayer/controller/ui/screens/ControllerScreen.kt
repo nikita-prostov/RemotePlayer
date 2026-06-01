@@ -50,9 +50,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ControllerScreen(){
     val viewModel = koinViewModel<ControllerScreenVM>()
-    viewModel.getCurrentState()
     LaunchedEffect(Unit) {
         viewModel.startPolling()
+        viewModel.getCurrentState()
     }
 
     DisposableEffect(Unit) {

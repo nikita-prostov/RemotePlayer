@@ -58,7 +58,7 @@ fun MainScreen() {
         }
         openWarningScreen = false
     }
-    
+
    if(viewModel.serverAvailable && !openSettingsScreen){
         Row(modifier = Modifier.fillMaxSize().padding(16.dp,32.dp,64.dp,8.dp)) {
             Column(
