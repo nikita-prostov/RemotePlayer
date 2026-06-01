@@ -28,15 +28,17 @@ namespace NKS.Interactive.RemotePlayer.Server.Controllers
         [HttpPost("play")]
         public async Task<IActionResult> Play([FromBody] TrackInfo? trackInfo = null)
         {
-            if (audioService.CurrentTrack == null)
+            if (trackInfo != null)
             {
-                await audioService.Start();
+                await audioService.Play(trackInfo);
                 return Ok(audioService.CurrentTrack);
             }
-            if (trackInfo == null)
-                audioService.Play();
+
+            if (audioService.CurrentTrack == null)
+                await audioService.Start();
             else
-                await audioService.Play(trackInfo);
+                await audioService.Play();
+
             return Ok(audioService.CurrentTrack);
         }
 

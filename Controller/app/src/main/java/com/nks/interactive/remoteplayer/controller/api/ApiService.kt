@@ -18,7 +18,7 @@ interface ApiService {
     suspend fun setVolume(@Query("value") value: Float): Response<ResponseBody>
 
     @POST("play")
-    suspend fun play(): TrackInfo
+    suspend fun play(): Response<TrackInfo?>?
 
     @POST("play")
     suspend fun play(@Body trackInfo: TrackInfo? = null): TrackInfo

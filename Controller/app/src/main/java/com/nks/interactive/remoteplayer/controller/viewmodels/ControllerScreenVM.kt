@@ -78,7 +78,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     fun play() {
         if (!_isPlaying.value) {
             viewModelScope.launch {
-                _currentTrack = apiService.play()
+                _currentTrack = apiService.play()?.body()
                 _isPlaying.value = true
             }
         }
@@ -119,10 +119,11 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
         lastPage++
         viewModelScope.launch {
             val tracks = apiService.load(page = lastPage).toMutableList()
-            for (track in _trackList.value){
-                tracks.addFirst(track)
+            val oldTracks = _trackList.value.toMutableList()
+            for (track in tracks){
+                oldTracks.add(track)
             }
-            _trackList.value = tracks
+            _trackList.value = oldTracks
         }
     }
 

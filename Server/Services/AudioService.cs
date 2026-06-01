@@ -64,7 +64,20 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
             await player.PlayAsync(track.Url.ToString(), track);
         }
 
-        public void Play() => player.Play();
+        public async Task Play() 
+        {
+            if(player.CurrentTrack == null && !player.IsPlaying)
+            {
+                var track = useShuffled ? shuffledAudios[current] : audios[current];
+                await player.PlayAsync(track.Url.ToString(), track);
+                player.PlaybackStopped += Player_PlayNext;
+                isStarted = true;
+            }
+            else
+            {
+                player.Play();
+            }
+        }
 
         public void Pause() => player.Pause();
 
