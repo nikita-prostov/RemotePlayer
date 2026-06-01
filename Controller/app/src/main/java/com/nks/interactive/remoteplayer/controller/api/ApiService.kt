@@ -47,6 +47,9 @@ interface ApiService {
     @GET("track/current")
     suspend fun getCurrent(): Response<TrackInfo>
 
+    @GET("track/next")
+    suspend fun getNext(): Response<TrackInfo>
+
     @GET("state")
     suspend fun getState(): ServerState
 }

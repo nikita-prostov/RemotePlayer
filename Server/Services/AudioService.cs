@@ -177,5 +177,18 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
             }
             return list;
         }
+
+        public TrackInfo GetNext()
+        {
+            int nextIndex = current + 1;
+            if (nextIndex >= audios.Count) nextIndex = 0;
+
+            var track = useShuffled ? shuffledAudios[nextIndex] : audios[nextIndex];
+            return new TrackInfo
+            {
+                Artist = track.Artist,
+                Title = track.Title
+            };
+        }
     }
 }

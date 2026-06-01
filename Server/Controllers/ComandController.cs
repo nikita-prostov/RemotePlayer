@@ -85,5 +85,11 @@ namespace NKS.Interactive.RemotePlayer.Server.Controllers
             return Ok(audioService.State);
         }
 
+        [HttpGet("track/next")]
+        public IActionResult GetNextTrack()
+        {
+            return Ok(audioService.GetNext());
+        }
+
     }
 }

@@ -17,9 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.nks.interactive.remoteplayer.controller.R
 import com.nks.interactive.remoteplayer.controller.ui.theme.ControllerTheme
@@ -48,12 +52,31 @@ fun ControllerScreen(){
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column(modifier = Modifier.padding(8.dp),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(Modifier.height(16.dp))
-            Text(viewModel.currentTrack?.title?: "Нет трека", color = MaterialTheme.colorScheme.onBackground)
-            Spacer(Modifier.height(16.dp))
-            Text(viewModel.currentTrack?.artist?: "Неизвестный исполнитель", color = MaterialTheme.colorScheme.onBackground)
-            Spacer(Modifier.height(16.dp))
+        OutlinedCard(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+            contentColor = MaterialTheme.colorScheme.onBackground)) {
+            Column(
+                modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.Center) {
+                Text("Сейчас играет:")
+                Spacer(Modifier.height(8.dp))
+                Text("Трек: "+(viewModel.currentTrack?.title?: "Нет трека"))
+                Spacer(Modifier.height(8.dp))
+                Text("Исполнитель: "+(viewModel.currentTrack?.artist?: "Неизвестный исполнитель"))
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+        OutlinedCard(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground)) {
+            Column(Modifier.padding(8.dp).fillMaxWidth()) {
+                Text("Далее:", style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(4.dp))
+                Text("Трек: "+(viewModel.nextTrack?.title?: "Нет трека"),
+                        style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(4.dp))
+                Text("Исполнитель: "+(viewModel.nextTrack?.artist?: "Неизвестный исполнитель"),
+                    style = MaterialTheme.typography.bodySmall)
+            }
         }
         Spacer(Modifier.weight(1f))
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -95,7 +118,7 @@ fun ControllerScreen(){
                 )
             }
         }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(16.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)

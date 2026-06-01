@@ -18,6 +18,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
 
     private var _isInitialized = false
     private var _currentTrack by mutableStateOf<TrackInfo?>(null)
+    private var _nextTrack by mutableStateOf<TrackInfo?>(null)
     private var _isPlaying = mutableStateOf(false)
     private var _isShuffled = mutableStateOf(false)
     private var _volume = mutableFloatStateOf(1f)
@@ -30,13 +31,16 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     val currentTrack: TrackInfo?
         get() = _currentTrack
 
+    val nextTrack: TrackInfo?
+        get() = _nextTrack
+
     val isPlaying: Boolean
         get() = _isPlaying.value
 
     var volume: Float
-        get() = _volume.value
+        get() = _volume.floatValue
         set(value){
-            _volume.value = value;
+            _volume.floatValue = value;
             volumeJob?.cancel()
             volumeJob = viewModelScope.launch {
                 delay(300)
@@ -59,7 +63,10 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
                 }
                 _isPlaying.value = response.isPlaying
                 _isShuffled.value = response.isShuffled
-                _volume.value = response.volume
+                _volume.floatValue = response.volume
+
+                val nextTrackResponse = apiService.getNext()
+                _nextTrack = nextTrackResponse.body()
                 _isInitialized = true
             }
         }
@@ -79,6 +86,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
         if (!_isPlaying.value) {
             viewModelScope.launch {
                 _currentTrack = apiService.play()?.body()
+                _nextTrack = apiService.getNext().body()
                 _isPlaying.value = true
             }
         }
@@ -96,6 +104,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     fun nextTrack(){
         viewModelScope.launch {
             _currentTrack = apiService.switch("next")
+            _nextTrack = apiService.getNext().body()
             _isPlaying.value = true
         }
     }
@@ -103,6 +112,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     fun prevTrack(){
         viewModelScope.launch {
             _currentTrack = apiService.switch("prev")
+            _nextTrack = apiService.getNext().body()
             _isPlaying.value = true
         }
     }
@@ -130,6 +140,7 @@ class ControllerScreenVM(private val apiService: ApiService) : ViewModel() {
     fun play(trackInfo: TrackInfo){
         viewModelScope.launch {
             _currentTrack = apiService.play(trackInfo)
+            _nextTrack = apiService.getNext().body()
             _isPlaying.value = true
         }
     }
