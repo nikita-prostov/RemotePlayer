@@ -93,7 +93,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
                 List<string> content = File.ReadAllLines(path).ToList();
                 if (content.Count == 4)
                 {
-                    content[4] = value.ToString();
+                    content[3] = value.ToString();
                 }
                 else
                 {
