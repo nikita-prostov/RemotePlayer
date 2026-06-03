@@ -81,6 +81,5 @@ builder.Services.AddSingleton(audioService);
 
 var app = builder.Build();
 app.MapControllers();
-
+Console.WriteLine("Сервер запущен");
 app.Run("http://0.0.0.0:5000");
-

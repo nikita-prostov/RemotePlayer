@@ -84,25 +84,22 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
 
         public void SetVolume(float value)
         {
+            player.Volume = value;
             float tolerance = 0.1f;
-            float minValue = player.Volume - tolerance;
+            float minValue = Math.Max(player.Volume - tolerance,0);
             float maxValue = player.Volume + tolerance;
             if (value > maxValue || value < minValue)
             {
                 string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VkAudioPlayer", "data.txt");
                 List<string> content = File.ReadAllLines(path).ToList();
+                
                 if (content.Count == 4)
-                {
                     content[3] = value.ToString();
-                }
                 else
-                {
                     content.Add(value.ToString());
-                }
-                player.Volume = value;
+                
                 File.WriteAllLines(path, content);
             }
-            
         }
 
         public void Shuffle()
@@ -194,7 +191,7 @@ namespace NKS.Interactive.RemotePlayer.Server.Services
                 list.Add(new TrackInfo
                 {
                     Artist = track.Artist,
-                    Title = track.Title
+                    Title = track.Title,
                 });
             }
             return list;
